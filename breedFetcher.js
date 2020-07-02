@@ -1,16 +1,30 @@
 //require the request library
 const request = require('request');
+//inline argument
+const breedName = process.argv.slice(2).toString();
 
-const breedArg = `?q=${process.argv.slice(2)}`;
-const URL = `https://api.thecatapi.com/v1/breeds/search${breedArg}`;
 
-request(URL, 'utf8', (error, response, body) => {
-  if (error) console.log(error); //Handle request errors and print the error details to the screen.
-  if (body !== []) {
+const fetchBreedDescription = function (breedName, callback) {
+  const URL = `https://api.thecatapi.com/v1/breeds/search?q=${breedName}`;
+
+  request(URL, 'utf8', (error, response, body) => {
+    //handling an error
+    // if (error) {
+    //   return callback(error, null)
+    // }
+
     const bodyToObject = JSON.parse(body);
-    console.log(bodyToObject[0].description);
-  } else {
-    console.log(`Sorry, the requested breed '${breedArg.slice(3)}' is not found`);//Edge Case: Breed Not Found
-  }
-});
+    const catBreedInfo = bodyToObject[0];
 
+    if (catBreedInfo) {
+      callback(null, catBreedInfo['description'])
+    }
+
+    if (!catBreedInfo) {
+      callback(error, null);
+    };
+  })
+}
+
+module.exports = { fetchBreedDescription };
+`The requested breed has noot been found`
